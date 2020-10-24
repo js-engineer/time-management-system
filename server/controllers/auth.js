@@ -1,11 +1,9 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
-const _ = require('lodash');
 const sgMail = require('@sendgrid/mail');
 const User = require('../models/user');
 const Token = require('../models/token');
-const { USER_RESOURCE } = require('../constants');
 
 const controller = {};
 
@@ -84,9 +82,8 @@ controller.login = async (req, res) => {
       return;
     }
 
-    const userJson = user.toJSON();
     const token = jwt.sign(
-      _.pick(userJson, USER_RESOURCE),
+      { id: user._id, role: user.role },
       process.env.SECRET_KEY,
       {
         expiresIn: '12h',
