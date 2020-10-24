@@ -33,7 +33,6 @@ controller.register = async (req, res) => {
       email: value.email,
       password: bcrypt.hashSync(value.password, bcrypt.genSaltSync(10), null),
       preferredHours: value.preferredHours,
-      role: value.role,
     });
 
     const emailToken = await Token.createToken(newUser._id);

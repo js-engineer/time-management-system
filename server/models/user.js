@@ -29,10 +29,14 @@ User.getUserByEmail = (email) =>
     email,
   });
 
-User.countUsers = (dbQuery) => User.countDocuments(dbQuery);
+User.countUsers = () => User.countDocuments();
 
-User.listUsers = (dbQuery, pageSize) =>
-  User.find(dbQuery).sort('-createdAt').limit(pageSize).lean();
+User.listUsers = (pageNum, pageSize) =>
+  User.find()
+    .sort('-createdAt')
+    .skip((pageNum - 1) * pageSize)
+    .limit(pageSize)
+    .lean();
 
 User.getUserById = (id) => User.findById(id);
 
