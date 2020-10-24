@@ -2,12 +2,14 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
-
+const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+const _ = require('lodash');
+const { USER_RESOURCE } = require('./constants');
 
 dotenv.config();
 
-const apiRoutes = require('./routes/apiRoutes');
+const auth = require('./routes/auth');
 
 // MongoDB config
 require('./loaders/db');
@@ -20,7 +22,23 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(logger('dev'));
 
-app.use('/api', apiRoutes);
+app.use(async (req, res, next) => {
+  try {
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith('Bearer ')
+    ) {
+      const userJson = jwt.verify(
+        req.headers.authorization.split(' ')[1],
+        process.env.SECRET_KEY
+      );
+      req.user = _.pick(userJson, USER_RESOURCE);
+    }
+  } catch (err) {}
+  next();
+});
+
+app.use('/auth', auth);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on http://localhost:${process.env.PORT}`);
