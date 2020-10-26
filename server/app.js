@@ -35,7 +35,13 @@ app.use(async (req, res, next) => {
         req.headers.authorization.split(' ')[1],
         process.env.SECRET_KEY
       );
-      req.user = { id: userJson.id, role: userJson.role };
+      req.user = {
+        id: userJson.id,
+        role: userJson.role,
+        name: userJson.name,
+        email: userJson.email,
+        preferredHours: userJson.preferredHours,
+      };
     }
   } catch (err) {}
   next();
