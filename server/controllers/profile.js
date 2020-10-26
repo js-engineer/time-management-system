@@ -8,7 +8,7 @@ const controller = {};
 
 controller.getProfile = async (req, res) => {
   try {
-    const user = await User.getUserById(req.user.id);
+    const user = await User.getUserById(req.user._id);
     if (!user) {
       res.status(404).json({ err: 'Cannot find user' });
       return;
@@ -23,7 +23,7 @@ controller.getProfile = async (req, res) => {
 
 controller.deleteProfile = async (req, res) => {
   try {
-    const user = await User.getUserById(req.user.id);
+    const user = await User.getUserById(req.user._id);
     if (!user) {
       res.status(404).json({ err: 'Cannot find user' });
       return;
@@ -50,7 +50,7 @@ controller.updatePreferredHours = async (req, res) => {
   }
 
   try {
-    const user = await User.getUserById(req.user.id);
+    const user = await User.getUserById(req.user._id);
     if (!user) {
       res.status(404).json({ err: 'Cannot find user' });
       return;
@@ -79,7 +79,7 @@ controller.updatePassword = async (req, res) => {
   }
 
   try {
-    const user = await User.getUserById(req.user.id);
+    const user = await User.getUserById(req.user._id);
     if (!user) {
       res.status(404).json({ err: 'Cannot find user' });
       return;

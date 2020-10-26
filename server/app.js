@@ -36,7 +36,7 @@ app.use(async (req, res, next) => {
         process.env.SECRET_KEY
       );
       req.user = {
-        id: userJson.id,
+        _id: userJson._id,
         role: userJson.role,
         name: userJson.name,
         email: userJson.email,

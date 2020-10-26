@@ -22,14 +22,17 @@ Record.createRecord = async (data) => {
 
 Record.countRecords = (query) => Record.countDocuments(query);
 
-Record.listRecords = (query, pageNum, pageSize) =>
-  Record.find(query)
+Record.listRecords = (query, pageNum, pageSize) => {
+  if (pageSize === -1) {
+    return Record.find(query).populate('user').sort('-date').lean();
+  }
+  return Record.find(query)
     .populate('user')
     .sort('-date')
     .skip((pageNum - 1) * pageSize)
     .limit(pageSize)
     .lean();
-
+};
 Record.getRecordById = (id) => Record.findById(id);
 Record.getRecordByUserAndDate = (user, date) => Record.findOne({ user, date });
 

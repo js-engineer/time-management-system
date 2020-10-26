@@ -23,11 +23,11 @@ controller.createRecord = async (req, res) => {
     if (!user) {
       return res.status(404).json({ err: 'Cannot find user' });
     }
-    if (value.user !== req.user.id && req.user.role !== USER_ROLE.ADMIN) {
+    if (value.user !== req.user._id && req.user.role !== USER_ROLE.ADMIN) {
       return res.status(403).json({ err: 'No permission' });
     }
     const existingRecord = await Record.getRecordByUserAndDate(
-      req.user.id,
+      req.user._id,
       value.date
     );
     if (existingRecord) {
@@ -44,8 +44,8 @@ controller.listUserRecords = async (req, res) => {
   const schema = Joi.object({
     from: Joi.date().optional(),
     to: Joi.date().optional(),
-    pageNum: Joi.number().integer().positive().required(),
-    pageSize: Joi.number().integer().positive().required(),
+    pageNum: Joi.number().integer().required(),
+    pageSize: Joi.number().integer().required(),
   });
   const { error, value } = schema.validate(req.query);
   if (error) {
@@ -54,7 +54,7 @@ controller.listUserRecords = async (req, res) => {
     return res.status(400).json({ err });
   }
 
-  if (req.user.id !== req.params.userId && req.user.role !== USER_ROLE.ADMIN) {
+  if (req.user._id !== req.params.userId && req.user.role !== USER_ROLE.ADMIN) {
     return res.status(403).json({ err: 'No permission' });
   }
 
@@ -90,8 +90,8 @@ controller.listAllRecords = async (req, res) => {
   const schema = Joi.object({
     from: Joi.date().optional(),
     to: Joi.date().optional(),
-    pageNum: Joi.number().integer().positive().required(),
-    pageSize: Joi.number().integer().positive().required(),
+    pageNum: Joi.number().integer().required(),
+    pageSize: Joi.number().integer().required(),
   });
   const { error, value } = schema.validate(req.query);
   if (error) {
@@ -132,7 +132,7 @@ controller.getRecordById = async (req, res) => {
     }
 
     if (
-      record.user.toString() !== req.user.id &&
+      record.user.toString() !== req.user._id &&
       req.user.role !== USER_ROLE.ADMIN
     ) {
       return res.status(403).json({ err: 'No permission' });
@@ -155,7 +155,7 @@ controller.getRecordByUserAndDate = async (req, res) => {
       error.details.length > 0 ? error.details[0].message : 'Invalid request';
     return res.status(400).json({ err });
   }
-  if (value.user !== req.user.id && req.user.role !== USER_ROLE.ADMIN) {
+  if (value.user !== req.user._id && req.user.role !== USER_ROLE.ADMIN) {
     return res.status(403).json({ err: 'No permission' });
   }
   try {
@@ -178,7 +178,7 @@ controller.deleteRecord = async (req, res) => {
     }
 
     if (
-      record.user.toString() !== req.user.id &&
+      record.user.toString() !== req.user._id &&
       req.user.role !== USER_ROLE.ADMIN
     ) {
       return res.status(403).json({ err: 'No permission' });
@@ -208,7 +208,7 @@ controller.updateRecord = async (req, res) => {
     }
 
     if (
-      record.user.toString() !== req.user.id &&
+      record.user.toString() !== req.user._id &&
       req.user.role !== USER_ROLE.ADMIN
     ) {
       return res.status(403).json({ err: 'No permission' });

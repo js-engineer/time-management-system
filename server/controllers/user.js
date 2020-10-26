@@ -57,8 +57,8 @@ controller.listUsers = async (req, res) => {
   }
 
   const schema = Joi.object({
-    pageNum: Joi.number().integer().positive().required(),
-    pageSize: Joi.number().integer().positive().required(),
+    pageNum: Joi.number().integer().required(),
+    pageSize: Joi.number().integer().required(),
   });
   const { error, value } = schema.validate(req.query);
   if (error) {
