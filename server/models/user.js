@@ -29,10 +29,12 @@ User.getUserByEmail = (email) =>
     email,
   });
 
-User.countUsers = () => User.countDocuments();
+User.countUsers = () => User.countDocuments({ role: { $ne: USER_ROLE.ADMIN } });
 
 User.listUsers = (pageNum, pageSize) =>
   User.find()
+    .where('role')
+    .ne(USER_ROLE.ADMIN)
     .sort('-createdAt')
     .skip((pageNum - 1) * pageSize)
     .limit(pageSize)

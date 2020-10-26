@@ -10,6 +10,7 @@ dotenv.config();
 const auth = require('./routes/auth');
 const profile = require('./routes/profile');
 const user = require('./routes/user');
+const record = require('./routes/record');
 
 // MongoDB config
 require('./loaders/db');
@@ -41,6 +42,7 @@ app.use(async (req, res, next) => {
 app.use('/auth', auth);
 app.use('/profile', profile);
 app.use('/user', user);
+app.use('/record', record);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on http://localhost:${process.env.PORT}`);

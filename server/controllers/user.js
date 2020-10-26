@@ -10,8 +10,7 @@ controller.createUser = async (req, res) => {
     req.user.role !== USER_ROLE.MANAGER &&
     req.user.role !== USER_ROLE.ADMIN
   ) {
-    res.status(403).json({ err: 'No permission' });
-    return;
+    return res.status(403).json({ err: 'No permission' });
   }
 
   const schema = Joi.object({
@@ -31,8 +30,7 @@ controller.createUser = async (req, res) => {
   try {
     const existingUser = await User.getUserByEmail(value.email);
     if (existingUser) {
-      res.status(400).json({ err: 'User already exists' });
-      return;
+      return res.status(400).json({ err: 'User already exists' });
     }
 
     await User.createUser({
@@ -55,7 +53,7 @@ controller.listUsers = async (req, res) => {
     req.user.role !== USER_ROLE.MANAGER &&
     req.user.role !== USER_ROLE.ADMIN
   ) {
-    res.status(403).json({ err: 'No permission' });
+    return res.status(403).json({ err: 'No permission' });
   }
 
   const schema = Joi.object({
@@ -72,10 +70,7 @@ controller.listUsers = async (req, res) => {
   try {
     const totalCounts = await User.countUsers();
     const users = await User.listUsers(value.pageNum, value.pageSize);
-    res.json({
-      totalCounts,
-      users,
-    });
+    res.json({ totalCounts, users });
   } catch (err) {
     res.status(500).json({ err: 'Server error' });
   }
@@ -86,13 +81,12 @@ controller.getUser = async (req, res) => {
     req.user.role !== USER_ROLE.MANAGER &&
     req.user.role !== USER_ROLE.ADMIN
   ) {
-    res.status(403).json({ err: 'No permission' });
+    return res.status(403).json({ err: 'No permission' });
   }
   try {
     const user = await User.getUserById(req.params.id);
     if (!user) {
-      res.status(404).json({ err: 'Cannot find user' });
-      return;
+      return res.status(404).json({ err: 'Cannot find user' });
     }
     res.json({ user });
   } catch (err) {
@@ -105,13 +99,12 @@ controller.deleteUser = async (req, res) => {
     req.user.role !== USER_ROLE.MANAGER &&
     req.user.role !== USER_ROLE.ADMIN
   ) {
-    res.status(403).json({ err: 'No permission' });
+    return res.status(403).json({ err: 'No permission' });
   }
   try {
     const user = await User.getUserById(req.params.id);
     if (!user) {
-      res.status(404).json({ err: 'Cannot find user' });
-      return;
+      return res.status(404).json({ err: 'Cannot find user' });
     }
     await user.remove();
     res.json({ success: true });
@@ -125,7 +118,7 @@ controller.updateUser = async (req, res) => {
     req.user.role !== USER_ROLE.MANAGER &&
     req.user.role !== USER_ROLE.ADMIN
   ) {
-    res.status(403).json({ err: 'No permission' });
+    return res.status(403).json({ err: 'No permission' });
   }
 
   const schema = Joi.object({
@@ -146,8 +139,7 @@ controller.updateUser = async (req, res) => {
   try {
     const user = await User.getUserById(req.params.id);
     if (!user) {
-      res.status(404).json({ err: 'Cannot find user' });
-      return;
+      return res.status(404).json({ err: 'Cannot find user' });
     }
 
     const keys = Object.keys(value);
