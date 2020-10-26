@@ -1,12 +1,34 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div>
+  <v-app>
+    <v-app-bar app class="primary">
+      <h1 class="white--text">Time Management</h1>
+      <v-spacer />
+      <v-btn v-if="authenticated" text class="white--text">
+        <span class="mr-2" @click="logout">Log out</span>
+      </v-btn>
+    </v-app-bar>
+    <v-main app>
+      <router-view />
+    </v-main>
+  </v-app>
 </template>
+
+<script>
+export default {
+  name: 'App',
+  computed: {
+    authenticated() {
+      return !!this.$store.state.auth.user
+    }
+  },
+  methods: {
+    logout() {
+      this.$store.commit('auth/logout')
+      this.$router.push({ name: 'LogIn' })
+    }
+  }
+}
+</script>
 
 <style lang="scss">
 #app {
@@ -15,18 +37,7 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+  width: 100vw;
+  height: 100vh;
 }
 </style>
