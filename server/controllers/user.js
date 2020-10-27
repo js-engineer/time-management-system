@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
+const Record = require('../models/record');
 const { USER_ROLE } = require('../constants');
 
 const controller = {};
@@ -135,6 +136,7 @@ controller.deleteUser = async (req, res) => {
     ) {
       return res.status(403).json({ err: 'No permission' });
     }
+    await Record.where('user', user).remove();
     await user.remove();
     res.json({ success: true });
   } catch (err) {
