@@ -77,7 +77,7 @@
     </div>
     <v-dialog v-model="showNoteDialog" width="500">
       <v-card>
-        <v-card-title class="headline blue lighten-2">{{ noteIndex === -1 ? 'Add note' : 'Edit note' }}</v-card-title>
+        <v-card-title class="headline blue lighten-2 white--text">{{ noteIndex === -1 ? 'Add note' : 'Edit note' }}</v-card-title>
         <v-card-text>
           <v-textarea
             name="input-7-1"
@@ -269,9 +269,16 @@ export default {
           date: this.date
         })
         if (res.succeed) {
+          this.snackBarColor = 'orange darken-2'
+          this.snackBarText = 'Record already exists. You are gonna edit the record.'
+          this.showSnackBar = true
           this.recordId = res.record._id
           this.notes = res.record.notes
           this.hours = res.record.hours
+        } else {
+          this.recordId = null
+          this.notes = []
+          this.hours = 0
         }
       } catch (e) {
         console.log(e)
