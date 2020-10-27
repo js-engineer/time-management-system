@@ -194,6 +194,7 @@ controller.updateRecord = async (req, res) => {
   const schema = Joi.object({
     user: Joi.string().required(),
     notes: Joi.array().items(Joi.string()).required(),
+    date: Joi.date().required(),
     hours: Joi.number().required(),
   });
   const { error, value } = schema.validate(req.body);

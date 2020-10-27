@@ -61,6 +61,7 @@ const actions = {
     return Api.put(`/record/${data.id}`, {
       user: data.user,
       notes: data.notes,
+      date: data.date,
       hours: data.hours,
     })
     .then((res) => {

@@ -191,6 +191,7 @@ export default {
         const res = await this.$store.dispatch('record/updateRecord', {
           id: this.recordId,
           user: this.userId,
+          date: this.date,
           hours: this.hours,
           notes: this.notes
         })
