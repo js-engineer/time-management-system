@@ -11,6 +11,7 @@ import GlobeRecords from '../views/GlobeRecords.vue'
 import GlobeRecordDetail from '../views/GlobeRecordDetail.vue'
 import Settings from '../views/Settings.vue'
 import ChangePassword from '../views/ChangePassword.vue'
+import PermissionError from '../views/PermissionError.vue'
 import store from '../store'
 
 Vue.use(VueRouter)
@@ -71,6 +72,11 @@ const routes = [
     name: 'ChangePassword',
     component: ChangePassword,
   },
+  {
+    path: '/permission-error',
+    name: 'PermissionError',
+    component: PermissionError,
+  },
 ]
 
 const router = new VueRouter({
@@ -80,9 +86,17 @@ const router = new VueRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  if ( store.state.auth.user ) {
+  const RegularDisallowedRoutes = ['Users', 'UserDetail', 'GlobeRecords', 'GlobeRecordDetail'];
+  const ManagerDisallowedRoutes = ['GlobeRecords', 'GlobeRecordDetail'];
+  let user = store.state.auth.user
+  if ( user ) {
     // When user's authenticated
     if ( to.name !== 'LogIn' && to.name !== 'SignUp' && to.name !== 'VerifyEmail') {
+      // When User's authenticated, but has no permission for routes
+      if (user.role === 'regular' && RegularDisallowedRoutes.includes(to.name)
+        || user.role === 'manager' && ManagerDisallowedRoutes.includes(to.name)) {
+        return next({ name: 'PermissionError' })
+      }
       return next()
     } else {
       return next({ name: 'MyRecords' })
@@ -93,8 +107,14 @@ router.beforeEach(async (to, from, next) => {
       if (token) {
         const res = await store.dispatch('auth/checkToken', { token })
         if (res.succeed) {
+          user = store.state.auth.user
           // When user's authenticated, and page's refreshed
           if ( to.name !== 'LogIn' && to.name !== 'SignUp' && to.name !== 'VerifyEmail') {
+            // User's authenticated, but has no permission for routes
+            if (user.role === 'regular' && RegularDisallowedRoutes.includes(to.name) 
+              || user.role === 'manager' && ManagerDisallowedRoutes.includes(to.name)) {
+              return next({ name: 'PermissionError' })
+            }
             return next()
           } else {
             return next({ name: 'MyRecords' })
