@@ -22,19 +22,19 @@
         dense
         nav
       >
-        <v-list-item link>
+        <v-list-item link @click="onNavigate('MyRecords')">
           <v-list-item-content>
-            <v-list-item-title>My Records</v-list-item-title>
+            <v-list-item-title :class="{ 'blue--text': activeItem === 'MyRecords' }">My Records</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item v-if="role === 'manager' || role === 'admin'" link>
+        <v-list-item v-if="role === 'manager' || role === 'admin'" link @click="onNavigate('Users')">
           <v-list-item-content>
-            <v-list-item-title>Users</v-list-item-title>
+            <v-list-item-title :class="{ 'blue--text': activeItem === 'Users' }">Users</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item v-if="role === 'admin'" link>
+        <v-list-item v-if="role === 'admin'" link @click="onNavigate('Records')">
           <v-list-item-content>
-            <v-list-item-title>Records</v-list-item-title>
+            <v-list-item-title :class="{ 'blue--text': activeItem === 'Records' }">Records</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -45,6 +45,7 @@
 <script>
 export default {
   name: 'NavigationBar',
+  props: ['activeItem'],
   computed: {
     username() {
       return this.$store.state.auth.user.name
@@ -60,6 +61,9 @@ export default {
     return {}
   },
   methods: {
+    onNavigate(name) {
+      this.$router.push({ name })
+    }
   }
 }
 </script>

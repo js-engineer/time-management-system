@@ -3,7 +3,7 @@
     <v-snackbar v-model="showSnackBar" top :color="snackBarColor">
       {{ snackBarText }}
     </v-snackbar>
-    <NavigationBar />
+    <NavigationBar activeItem="MyRecords" />
     <div class="ml-5 pa-3 main-content">
       <v-form v-model="valid">
         <v-row>

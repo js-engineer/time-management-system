@@ -3,7 +3,7 @@
     <v-snackbar v-model="showSnackBar" top :color="snackBarColor" timeout="3000">
       {{ snackBarText }}
     </v-snackbar>
-    <NavigationBar />
+    <NavigationBar activeItem="MyRecords" />
     <div class="ml-5 pa-3 main-content">
       <v-row>
         <v-col sm="12">
