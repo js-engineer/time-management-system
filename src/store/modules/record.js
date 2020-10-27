@@ -6,6 +6,18 @@ const state = {
 const getters = {};
 
 const actions = {
+  getGlobeRecordList(_, data) {
+    let url = `/record/list/all?pageNum=${ data.pageNum }&pageSize=${ data.pageSize }`
+    url = data.from ? `${ url }&from=${ data.from }` : url
+    url = data.to ? `${ url }&to=${ data.to }` : url
+    return Api.get(url)
+    .then((res) => {
+      return { succeed: true, totalCounts: res.data.totalCounts, records: res.data.records }
+    })
+    .catch(err => {
+     return { succeed: false, message: err.response.data.err || 'Unknown Error Occured.' }
+    })
+  },
   getUserRecordList(_, data) {
     let url = `/record/list/${ data.userId }?pageNum=${ data.pageNum }&pageSize=${ data.pageSize }`
     url = data.from ? `${ url }&from=${ data.from }` : url
@@ -47,6 +59,7 @@ const actions = {
   },
   updateRecord(_, data) {
     return Api.put(`/record/${data.id}`, {
+      user: data.user,
       notes: data.notes,
       hours: data.hours,
     })

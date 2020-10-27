@@ -41,8 +41,11 @@ export default {
   height: 100vh;
 }
 .main-content {
-   width: calc(100% - 276px);
-   height: 100%;
-   border: 1px dashed darkgray;
+  width: calc(100% - 276px);
+  height: 100%;
+  border: 1px dashed darkgray;
+}
+.v-list-item__title {
+  text-align: left;
 }
 </style>

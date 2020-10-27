@@ -7,6 +7,8 @@ import MyRecords from '../views/MyRecords.vue'
 import MyRecordDetail from '../views/MyRecordDetail.vue'
 import Users from '../views/Users.vue'
 import UserDetail from '../views/UserDetail.vue'
+import GlobeRecords from '../views/GlobeRecords.vue'
+import GlobeRecordDetail from '../views/GlobeRecordDetail.vue'
 import store from '../store'
 
 Vue.use(VueRouter)
@@ -46,6 +48,16 @@ const routes = [
     path: '/user/detail',
     name: 'UserDetail',
     component: UserDetail,
+  },
+  {
+    path: '/globerecords',
+    name: 'GlobeRecords',
+    component: GlobeRecords
+  },
+  {
+    path: '/globerecord/detail',
+    name: 'GlobeRecordDetail',
+    component: GlobeRecordDetail,
   },
 ]
 

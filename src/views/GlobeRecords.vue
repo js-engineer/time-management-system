@@ -3,14 +3,23 @@
     <v-snackbar v-model="showSnackBar" top :color="snackBarColor" timeout="3000">
       {{ snackBarText }}
     </v-snackbar>
-    <NavigationBar activeItem="Users" />
+    <NavigationBar activeItem="GlobeRecords" />
     <div class="ml-5 pa-3 main-content">
       <v-row>
-        <v-col sm="4">
-          <h2 class="text-left">User List</h2>
+        <v-col sm="12">
+          <h2 class="text-left">Global Record List</h2>
         </v-col>
-        <v-col class="d-flex justify-end" sm="8">
-          <v-btn color="primary" @click="onNew()">
+      </v-row>
+      <v-row>
+        <v-col sm="4">
+          <DatePicker v-model="from" label="From" />
+        </v-col>
+        <v-col sm="4">
+          <DatePicker v-model="to" label="To" />
+        </v-col>
+        <v-col class="d-flex justify-content-end" sm="4">
+          <v-spacer></v-spacer>
+          <v-btn class="mt-4" color="primary" @click="onNew()">
             <v-icon dark left>
               mdi-plus
             </v-icon>
@@ -20,7 +29,7 @@
       </v-row>
       <v-data-table
         :headers="headers"
-        :items="users"
+        :items="records"
         :options.sync="options"
         :server-items-length="totalCounts"
         :loading="loading"
@@ -30,10 +39,10 @@
           <tbody>
             <tr v-for="(item, index) in props.items" :key="index">
               <td>{{ index + 1 }}</td>
-              <td>{{ item['name'] }}</td>
-              <td>{{ item['email'] }}</td>
-              <td>{{ item['preferredHours'] }}</td>
-              <td>{{ item['role'] }}</td>
+              <td>{{ item['user']['name'] }}</td>
+              <td>{{ item['date'].split('T')[0] }}</td>
+              <td>{{ item['hours'] }}</td>
+              <td>{{ item['notes'][0] ? `${item['notes'][0]} [${item['notes'].length}]` : '[0]' }}</td>
               <td>
                 <v-btn text icon color="blue darken-2" @click="onEdit( item['_id'] )">
                   <v-icon>mdi-pencil</v-icon>
@@ -51,7 +60,7 @@
       <v-card>
         <v-card-title class="headline blue lighten-2 white--text">Confirm delete</v-card-title>
         <v-card-text class="text-left mt-5">
-          Are you sure to delete this user?
+          Are you sure to delete this record?
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions>
@@ -66,26 +75,30 @@
 
 <script>
 import NavigationBar from '../components/NavigationBar'
+import DatePicker from '../components/DatePicker'
 
 export default {
-  name: 'Users',
+  name: 'GlobeRecords',
   components: {
     NavigationBar,
+    DatePicker,
   },
   data() {
     return {
       headers: [
         { text: 'No', align: 'center', sortable: false },
         { text: 'Name', align: 'center', sortable: false },
-        { text: 'E-mail', align: 'center', sortable: false },
-        { text: 'PreferredHours', align: 'center', sortable: false },
-        { text: 'Role', align: 'center', sortable: false },
+        { text: 'Date', align: 'center', sortable: false },
+        { text: 'Hours', align: 'center', sortable: false },
+        { text: 'Note', align: 'center', sortable: false },
         { text: 'Actions', align: 'center', sortable: false },
       ],
       loading: true,
       options: {},
-      users: [],
+      records: [],
       totalCounts: 0,
+      from: null,
+      to: null,
       showDeleteDialog: false,
       selectedId: null,
       showSnackBar: false,
@@ -96,25 +109,41 @@ export default {
   watch: {
     options: {
       handler () {
-        this.getUsers()
+        this.getRecords()
       },
       deep: true,
     },
+    from: {
+      handler () {
+        this.getRecords()
+      }
+    },
+    to: {
+      handler () {
+        this.getRecords()
+      }
+    }
   },
   mounted() {
-    this.getUsers()
+    this.getRecords()
   },
   methods: {
-    async getUsers() {
+    async getRecords() {
       try {
         this.loading = true
         const params = {
           pageNum: this.options.page,
           pageSize: this.options.itemsPerPage,
         };
-        const res = await this.$store.dispatch('user/getUserList', params)
+        if (this.from) {
+          params['from'] = this.from
+        }
+        if (this.to) {
+          params['to'] = this.to
+        }
+        const res = await this.$store.dispatch('record/getGlobeRecordList', params)
         if (res.succeed) {
-          this.users = res.users
+          this.records = res.records
           this.totalCounts = res.totalCounts
           this.loading = false
         }
@@ -123,10 +152,10 @@ export default {
       }
     },
     onNew() {
-      this.$router.push({ name: 'UserDetail' })
+      this.$router.push({ name: 'GlobeRecordDetail' })
     },
     onEdit(id) {
-      this.$router.push({ name: 'UserDetail', query: { id } })
+      this.$router.push({ name: 'GlobeRecordDetail', query: { id } })
     },
     onDelete(id) {
       this.selectedId = id
@@ -134,13 +163,13 @@ export default {
     },
     async onConfirmDelete() {
       try {
-        const res = await this.$store.dispatch('user/deleteUser', { id: this.selectedId })
+        const res = await this.$store.dispatch('record/deleteRecord', { id: this.selectedId })
         if (res.succeed) {
           this.snackBarColor = 'success'
-          this.snackBarText = 'User deleted successfully.'
+          this.snackBarText = 'Record deleted successfully.'
           this.showDeleteDialog = false
           this.showSnackBar = true
-          this.getUsers()
+          this.getRecords()
         } else {
           this.snackBarColor = 'error'
           this.snackBarText = res.message
@@ -149,7 +178,7 @@ export default {
         }
       } catch (e) {
         this.snackBarColor = 'error'
-        this.snackBarText = 'User delete failed. Try again.'
+        this.snackBarText = 'Record delete failed. Try again.'
         this.showDeleteDialog = false
         this.showSnackBar = true
       }

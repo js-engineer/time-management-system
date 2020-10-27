@@ -58,7 +58,6 @@
           v-model="role"
           :items="roleItems"
           label="User Role"
-          outlined
         ></v-combobox>
         <v-layout class="mt-3" align-center justify-end>
           <v-btn @click="onSave" class="primary white--text" :disabled="!valid || processing">
@@ -142,17 +141,9 @@ export default {
           this.preferredHours = res.user.preferredHours
           this.enablePasswordChange = false
           this.role = res.user.role
-        } else {
-          this.name = ''
-          this.email = ''
-          this.preferredHours = 0
-          this.role = ''
         }
       } catch (e) {
-        this.name = ''
-        this.email = ''
-        this.preferredHours = 0
-        this.role = null
+        console.log(e)
       }
     }
   },

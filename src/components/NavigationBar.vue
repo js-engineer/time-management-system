@@ -32,9 +32,9 @@
             <v-list-item-title :class="{ 'blue--text': activeItem === 'Users' }">Users</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item v-if="role === 'admin'" link @click="onNavigate('Records')">
+        <v-list-item v-if="role === 'admin'" link @click="onNavigate('GlobeRecords')">
           <v-list-item-content>
-            <v-list-item-title :class="{ 'blue--text': activeItem === 'Records' }">Records</v-list-item-title>
+            <v-list-item-title :class="{ 'blue--text': activeItem === 'GlobeRecords' }">Records</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>

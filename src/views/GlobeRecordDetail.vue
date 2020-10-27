@@ -3,14 +3,25 @@
     <v-snackbar v-model="showSnackBar" top :color="snackBarColor">
       {{ snackBarText }}
     </v-snackbar>
-    <NavigationBar activeItem="MyRecords" />
+    <NavigationBar activeItem="GlobeRecords" />
     <div class="ml-5 pa-3 main-content">
       <v-form v-model="valid">
         <v-row>
           <v-col sm="12">
-            <h2 class="text-left">My Record Detail</h2>
+            <h2 class="text-left">Global Record Detail</h2>
           </v-col>
         </v-row>
+
+        <v-select
+          :items="userList"
+          item-text="name"
+          item-value="_id"
+          label="Select User"
+          v-model="userId"
+          :rules="userRules"
+        >
+        </v-select>
+
         <DatePicker v-model="date" label="Date" :rules="dateRules" />
         <v-text-field
           label="Hours"
@@ -100,6 +111,11 @@ export default {
       recordId: null,
       valid: false,
       date: null,
+      userId: null,
+      userRules: [
+        (v) => !!v || 'User is required',
+      ],
+      userList: [],
       dateRules: [
         (v) => !!v || 'Date is required',
       ],
@@ -117,29 +133,17 @@ export default {
       processing: false,
     }
   },
-  computed: {
-    userId() {
-      return this.$store.state.auth.user._id
-    }
-  },
   watch: {
     date: {
       async handler () {
-        try {
-          const res = await this.$store.dispatch('record/getRecordByUserAndDate', {
-            userId: this.userId,
-            date: this.date
-          })
-          if (res.succeed) {
-            this.recordId = res.record._id
-            this.notes = res.record.notes
-            this.hours = res.record.hours
-          }
-        } catch (e) {
-          console.log(e)
-        }
+        this.getRecordByUserAndDate()
       }
     },
+    userId: {
+      async handler () {
+        this.getRecordByUserAndDate()
+      }
+    }
   },
   async mounted() {
     if (this.$route.query.id) {
@@ -147,6 +151,7 @@ export default {
       try {
         const res = await this.$store.dispatch('record/getRecordById', { id: this.recordId })
         if (res.succeed) {
+          this.userId = res.record.user._id
           this.notes = res.record.notes
           this.date = res.record.date.split('T')[0]
           this.hours = res.record.hours
@@ -155,6 +160,7 @@ export default {
         console.log(e)
       }
     }
+    this.getUserList()
   },
   methods: {
     onSave() {
@@ -189,8 +195,8 @@ export default {
     async updateRecord() {
       try {
         const res = await this.$store.dispatch('record/updateRecord', {
-          id: this.recordId,
           user: this.userId,
+          id: this.recordId,
           hours: this.hours,
           notes: this.notes
         })
@@ -200,7 +206,7 @@ export default {
           this.showSnackBar = true
           setTimeout(() => {
             this.processing = false
-            this.$router.push({ name: 'MyRecords' })
+            this.$router.push({ name: 'GlobeRecords' })
           }, 1000)
         } else {
           this.processing = false
@@ -229,7 +235,7 @@ export default {
           this.showSnackBar = true
           setTimeout(() => {
             this.processing = false
-            this.$router.push({ name: 'MyRecords' })
+            this.$router.push({ name: 'GlobeRecords' })
           }, 1000)
         } else {
           this.snackBarColor = 'error'
@@ -242,6 +248,32 @@ export default {
         this.snackBarText = 'Record create failed. Try again.'
         this.showSnackBar = true
         this.processing = false
+      }
+    },
+    async getUserList() {
+      try {
+        const params = { pageNum: 10, pageSize: -1 };
+        const res = await this.$store.dispatch('user/getUserList', params)
+        if (res.succeed) {
+          this.userList = res.users
+        }
+      } catch (e) {
+        console.log(e)
+      }
+    },
+    async getRecordByUserAndDate() {
+      try {
+        const res = await this.$store.dispatch('record/getRecordByUserAndDate', {
+          userId: this.userId,
+          date: this.date
+        })
+        if (res.succeed) {
+          this.recordId = res.record._id
+          this.notes = res.record.notes
+          this.hours = res.record.hours
+        }
+      } catch (e) {
+        console.log(e)
       }
     }
   }
