@@ -27,13 +27,19 @@ Record.listRecords = (query, pageNum, pageSize) => {
     return Record.find(query).populate('user').sort('-date').lean();
   }
   return Record.find(query)
-    .populate('user')
+    .select('-__v')
+    .populate('user', '-password -__v')
     .sort('-date')
     .skip((pageNum - 1) * pageSize)
     .limit(pageSize)
     .lean();
 };
-Record.getRecordById = (id) => Record.findById(id);
-Record.getRecordByUserAndDate = (user, date) => Record.findOne({ user, date });
+Record.getRecordById = (id) =>
+  Record.findById(id).select('-__v').populate('user', '-password -__v');
+
+Record.getRecordByUserAndDate = (user, date) =>
+  Record.findOne({ user, date })
+    .select('-__v')
+    .populate('user', '-password -__v');
 
 module.exports = Record;

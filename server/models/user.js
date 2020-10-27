@@ -35,12 +35,14 @@ User.countUsers = () => User.countDocuments({ role: { $ne: USER_ROLE.ADMIN } });
 User.listUsers = (pageNum, pageSize) => {
   if (pageSize === -1) {
     return User.find()
+      .select('-password -__v')
       .where('role')
       .ne(USER_ROLE.ADMIN)
       .sort('-createdAt')
       .lean();
   }
   return User.find()
+    .select('-password -__v')
     .where('role')
     .ne(USER_ROLE.ADMIN)
     .sort('-createdAt')
@@ -48,6 +50,6 @@ User.listUsers = (pageNum, pageSize) => {
     .limit(pageSize)
     .lean();
 };
-User.getUserById = (id) => User.findById(id);
+User.getUserById = (id) => User.findById(id).select('-password -__v');
 
 module.exports = User;

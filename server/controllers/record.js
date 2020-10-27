@@ -132,7 +132,7 @@ controller.getRecordById = async (req, res) => {
     }
 
     if (
-      record.user.toString() !== req.user._id &&
+      record.user._id.toString() !== req.user._id &&
       req.user.role !== USER_ROLE.ADMIN
     ) {
       return res.status(403).json({ err: 'No permission' });
@@ -178,7 +178,7 @@ controller.deleteRecord = async (req, res) => {
     }
 
     if (
-      record.user.toString() !== req.user._id &&
+      record.user._id.toString() !== req.user._id &&
       req.user.role !== USER_ROLE.ADMIN
     ) {
       return res.status(403).json({ err: 'No permission' });
@@ -208,7 +208,7 @@ controller.updateRecord = async (req, res) => {
     }
 
     if (
-      record.user.toString() !== req.user._id &&
+      record.user._id.toString() !== req.user._id &&
       req.user.role !== USER_ROLE.ADMIN
     ) {
       return res.status(403).json({ err: 'No permission' });
