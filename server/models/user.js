@@ -30,21 +30,14 @@ User.getUserByEmail = (email) =>
     email,
   });
 
-User.countUsers = () => User.countDocuments({ role: { $ne: USER_ROLE.ADMIN } });
+User.countUsers = (query) => User.countDocuments(query);
 
-User.listUsers = (pageNum, pageSize) => {
+User.listUsers = (query, pageNum, pageSize) => {
   if (pageSize === -1) {
-    return User.find()
-      .select('-password -__v')
-      .where('role')
-      .ne(USER_ROLE.ADMIN)
-      .sort('-createdAt')
-      .lean();
+    return User.find(query).select('-password -__v').sort('-createdAt').lean();
   }
-  return User.find()
+  return User.find(query)
     .select('-password -__v')
-    .where('role')
-    .ne(USER_ROLE.ADMIN)
     .sort('-createdAt')
     .skip((pageNum - 1) * pageSize)
     .limit(pageSize)

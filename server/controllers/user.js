@@ -6,6 +6,7 @@ const { USER_ROLE } = require('../constants');
 const controller = {};
 
 controller.createUser = async (req, res) => {
+  // Reject requests from Regular users
   if (
     req.user.role !== USER_ROLE.MANAGER &&
     req.user.role !== USER_ROLE.ADMIN
@@ -25,6 +26,14 @@ controller.createUser = async (req, res) => {
     const err =
       error.details.length > 0 ? error.details[0].message : 'Invalid request';
     return res.status(400).json({ err });
+  }
+
+  // Manager can create Regular users only, Admin can create Regular & Manager users only
+  if (
+    (value.role === USER_ROLE.MANAGER && req.user.role !== USER_ROLE.ADMIN) ||
+    value.role === USER_ROLE.ADMIN
+  ) {
+    return res.status(403).json({ err: 'No permission' });
   }
 
   try {
@@ -49,10 +58,12 @@ controller.createUser = async (req, res) => {
 };
 
 controller.listUsers = async (req, res) => {
-  if (
-    req.user.role !== USER_ROLE.MANAGER &&
-    req.user.role !== USER_ROLE.ADMIN
-  ) {
+  let query = {};
+  if (req.user.role === USER_ROLE.MANAGER) {
+    query = { role: { $eq: USER_ROLE.REGULAR } };
+  } else if (req.user.role === USER_ROLE.ADMIN) {
+    query = { role: { $ne: USER_ROLE.ADMIN } };
+  } else {
     return res.status(403).json({ err: 'No permission' });
   }
 
@@ -68,8 +79,8 @@ controller.listUsers = async (req, res) => {
   }
 
   try {
-    const totalCounts = await User.countUsers();
-    const users = await User.listUsers(value.pageNum, value.pageSize);
+    const totalCounts = await User.countUsers(query);
+    const users = await User.listUsers(query, value.pageNum, value.pageSize);
     res.json({ totalCounts, users });
   } catch (err) {
     res.status(500).json({ err: 'Server error' });
@@ -77,6 +88,7 @@ controller.listUsers = async (req, res) => {
 };
 
 controller.getUser = async (req, res) => {
+  // Reject requests from Regular users
   if (
     req.user.role !== USER_ROLE.MANAGER &&
     req.user.role !== USER_ROLE.ADMIN
@@ -88,6 +100,14 @@ controller.getUser = async (req, res) => {
     if (!user) {
       return res.status(404).json({ err: 'Cannot find user' });
     }
+
+    // Manager can get Regular users only, Admin can get Regular & Manager users only
+    if (
+      (user.role === USER_ROLE.MANAGER && req.user.role !== USER_ROLE.ADMIN) ||
+      user.role === USER_ROLE.ADMIN
+    ) {
+      return res.status(403).json({ err: 'No permission' });
+    }
     res.json({ user });
   } catch (err) {
     res.status(500).json({ err: 'Server error' });
@@ -95,6 +115,7 @@ controller.getUser = async (req, res) => {
 };
 
 controller.deleteUser = async (req, res) => {
+  // Reject requests from Regular users
   if (
     req.user.role !== USER_ROLE.MANAGER &&
     req.user.role !== USER_ROLE.ADMIN
@@ -105,6 +126,14 @@ controller.deleteUser = async (req, res) => {
     const user = await User.getUserById(req.params.id);
     if (!user) {
       return res.status(404).json({ err: 'Cannot find user' });
+    }
+
+    // Manager can delete Regular users only, Admin can delete Regular & Manager users only
+    if (
+      (user.role === USER_ROLE.MANAGER && req.user.role !== USER_ROLE.ADMIN) ||
+      user.role === USER_ROLE.ADMIN
+    ) {
+      return res.status(403).json({ err: 'No permission' });
     }
     await user.remove();
     res.json({ success: true });
@@ -140,6 +169,14 @@ controller.updateUser = async (req, res) => {
     const user = await User.getUserById(req.params.id);
     if (!user) {
       return res.status(404).json({ err: 'Cannot find user' });
+    }
+
+    // Manager can update Regular users only, Admin can update Regular & Manager users only
+    if (
+      (user.role === USER_ROLE.MANAGER && req.user.role !== USER_ROLE.ADMIN) ||
+      user.role === USER_ROLE.ADMIN
+    ) {
+      return res.status(403).json({ err: 'No permission' });
     }
 
     const keys = Object.keys(value);
