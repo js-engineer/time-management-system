@@ -1,25 +1,9 @@
 const Joi = require('joi');
 const bcrypt = require('bcrypt');
-const _ = require('lodash');
 const User = require('../models/user');
-const { USER_RESOURCE } = require('../constants');
+const Record = require('../models/record');
 
 const controller = {};
-
-controller.getProfile = async (req, res) => {
-  try {
-    const user = await User.getUserById(req.user._id);
-    if (!user) {
-      res.status(404).json({ err: 'Cannot find user' });
-      return;
-    }
-    const userJson = user.toJSON();
-    res.json({ user: _.pick(userJson, USER_RESOURCE) });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ err: 'Server error' });
-  }
-};
 
 controller.deleteProfile = async (req, res) => {
   try {
@@ -29,17 +13,18 @@ controller.deleteProfile = async (req, res) => {
       return;
     }
 
+    await Record.where('user', user).remove();
     await user.remove();
 
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ err: 'Server error' });
   }
 };
 
-controller.updatePreferredHours = async (req, res) => {
+controller.updateSettings = async (req, res) => {
   const schema = Joi.object({
+    name: Joi.string().required(),
     preferredHours: Joi.number().required(),
   });
   const { error, value } = schema.validate(req.body);
@@ -56,12 +41,12 @@ controller.updatePreferredHours = async (req, res) => {
       return;
     }
 
+    user.name = value.name;
     user.preferredHours = value.preferredHours;
     await user.save();
 
-    res.json({ success: true });
+    res.json({ success: true, user });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ err: 'Server error' });
   }
 };
@@ -79,7 +64,7 @@ controller.updatePassword = async (req, res) => {
   }
 
   try {
-    const user = await User.getUserById(req.user._id);
+    const user = await User.findById(req.user._id);
     if (!user) {
       res.status(404).json({ err: 'Cannot find user' });
       return;
@@ -95,7 +80,6 @@ controller.updatePassword = async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ err: 'Server error' });
   }
 };

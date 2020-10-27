@@ -11,9 +11,8 @@ router.use((req, res, next) => {
   }
 });
 
-router.get('/', controller.getProfile);
 router.delete('/', controller.deleteProfile);
-router.put('/preferredHours', controller.updatePreferredHours);
+router.put('/settings', controller.updateSettings);
 router.put('/password', controller.updatePassword);
 
 module.exports = router;
