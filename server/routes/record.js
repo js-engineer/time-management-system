@@ -14,6 +14,7 @@ router.use((req, res, next) => {
 router.post('/', controller.createRecord);
 router.get('/list/all', controller.listAllRecords);
 router.get('/list/:userId', controller.listUserRecords);
+router.get('/download/:userId', controller.downloadUserRecordSheet);
 router.get('/by-date', controller.getRecordByUserAndDate);
 router.get('/:id', controller.getRecordById);
 router.delete('/:id', controller.deleteRecord);

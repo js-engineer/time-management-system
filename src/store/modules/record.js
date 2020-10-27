@@ -80,6 +80,18 @@ const actions = {
       return { succeed: false, message: err.response.data.err || 'Unknown Error Occured.' }
     })
   },
+  downloadUserRecordSheet(_, data) {
+    let url = `/record/download/${ data.userId }?`
+    url = data.from ? `${ url }&from=${ data.from }` : url
+    url = data.to ? `${ url }&to=${ data.to }` : url
+    return Api.get(url)
+    .then((res) => {
+      return { succeed: true, data: res.data }
+    })
+    .catch(err => {
+     return { succeed: false, message: err.response.data.err || 'Unknown Error Occured.' }
+    })
+  },
 };
 
 const mutations = {

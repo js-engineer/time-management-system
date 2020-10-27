@@ -253,7 +253,7 @@ export default {
     },
     async getUserList() {
       try {
-        const params = { pageNum: 10, pageSize: -1 };
+        const params = { pageNum: 0, pageSize: -1 };
         const res = await this.$store.dispatch('user/getUserList', params)
         if (res.succeed) {
           this.userList = res.users

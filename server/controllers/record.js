@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const fs = require('fs');
 const Record = require('../models/record');
 const User = require('../models/user');
 const { USER_ROLE } = require('../constants');
@@ -224,6 +225,77 @@ controller.updateRecord = async (req, res) => {
     await record.save();
 
     res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ err: 'Server error' });
+  }
+};
+
+const getRecordsHtmlContent = (records) => {
+  let content = `<html>
+  <head>
+    <title>Records</title>
+    <style>
+      table,
+      th,
+      td {
+        padding: 10px;
+        border: 1px solid black;
+        border-collapse: collapse;
+      }
+    </style>
+  </head>
+  <body>
+    <table style="border: 1px solid #888888">
+      <tr>
+        <th>No</th><th>Date</th><th>Hours</th><th>Notes</th>`;
+  records.forEach((record, index) => {
+    content += `<tr>
+      <td>${index + 1}</td>
+      <td>${record.date.toISOString().split('T')[0]}</td>
+      <td>${record.hours}</td>
+      <td><ul>${record.notes.map((note) => `<li>${note}</li>`).join(' ')}</ul>
+      </td>
+    </tr>`;
+  });
+  content += '</table></body></html>';
+  return content;
+};
+
+controller.downloadUserRecordSheet = async (req, res) => {
+  const schema = Joi.object({
+    from: Joi.date().optional(),
+    to: Joi.date().optional(),
+  });
+  const { error, value } = schema.validate(req.query);
+  if (error) {
+    const err =
+      error.details.length > 0 ? error.details[0].message : 'Invalid request';
+    return res.status(400).json({ err });
+  }
+
+  if (req.user._id !== req.params.userId && req.user.role !== USER_ROLE.ADMIN) {
+    return res.status(403).json({ err: 'No permission' });
+  }
+
+  try {
+    const query = { user: req.params.userId };
+    if (value.from || value.to) {
+      query.date = Object.assign(
+        value.from ? { $gte: value.from } : {},
+        value.to ? { $lte: value.to } : {}
+      );
+    }
+    const records = await Record.listRecords(query, 0, -1);
+    const content = getRecordsHtmlContent(records);
+    const fileName = `${new Date().getTime().toString()}.html`;
+    fs.writeFile(`./sheets/${fileName}`, content, (err) => {
+      if (err) throw err;
+      res.writeHead(200, {
+        'Content-Type': 'application/octet-stream',
+        'Content-Disposition': `attachment; filename=${fileName}`,
+      });
+      fs.createReadStream(`./sheets/${fileName}`).pipe(res);
+    });
   } catch (err) {
     res.status(500).json({ err: 'Server error' });
   }
