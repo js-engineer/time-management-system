@@ -8,8 +8,11 @@
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title class="title">
-            Main Menu
+            {{ username }} ({{ role }})
           </v-list-item-title>
+          <v-list-item-subtitle>
+            {{ email }}
+          </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
 
@@ -24,12 +27,12 @@
             <v-list-item-title>My Records</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item link>
+        <v-list-item v-if="role === 'manager' || role === 'admin'" link>
           <v-list-item-content>
             <v-list-item-title>Users</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item link>
+        <v-list-item v-if="role === 'admin'" link>
           <v-list-item-content>
             <v-list-item-title>Records</v-list-item-title>
           </v-list-item-content>
@@ -42,6 +45,17 @@
 <script>
 export default {
   name: 'NavigationBar',
+  computed: {
+    username() {
+      return this.$store.state.auth.user.name
+    },
+    email() {
+      return this.$store.state.auth.user.email
+    },
+    role() {
+      return this.$store.state.auth.user.role
+    }
+  },
   data() {
     return {}
   },

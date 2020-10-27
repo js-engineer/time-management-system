@@ -40,4 +40,9 @@ export default {
   width: 100vw;
   height: 100vh;
 }
+.main-content {
+   width: calc(100% - 276px);
+   height: 100%;
+   border: 1px dashed darkgray;
+}
 </style>

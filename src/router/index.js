@@ -1,9 +1,10 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import MyRecords from '../views/MyRecords.vue'
 import LogIn from '../views/LogIn.vue'
 import SignUp from '../views/SignUp.vue'
 import VerifyEmail from '../views/VerifyEmail.vue'
+import MyRecords from '../views/MyRecords.vue'
+import MyRecordDetail from '../views/MyRecordDetail.vue'
 import store from '../store'
 
 Vue.use(VueRouter)
@@ -29,6 +30,11 @@ const routes = [
     name: 'MyRecords',
     component: MyRecords
   },
+  {
+    path: '/myrecord/detail',
+    name: 'MyRecordDetail',
+    component: MyRecordDetail,
+  }
 ]
 
 const router = new VueRouter({

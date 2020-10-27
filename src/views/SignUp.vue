@@ -8,7 +8,7 @@
         Sign Up
       </v-card-title>
       <v-card-text>
-        <v-form v-model="valid" ref="form">
+        <v-form v-model="valid">
           <v-text-field
             label="Username"
             v-model="name"
