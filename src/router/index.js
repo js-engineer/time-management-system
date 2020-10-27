@@ -5,6 +5,8 @@ import SignUp from '../views/SignUp.vue'
 import VerifyEmail from '../views/VerifyEmail.vue'
 import MyRecords from '../views/MyRecords.vue'
 import MyRecordDetail from '../views/MyRecordDetail.vue'
+import Users from '../views/Users.vue'
+import UserDetail from '../views/UserDetail.vue'
 import store from '../store'
 
 Vue.use(VueRouter)
@@ -34,7 +36,17 @@ const routes = [
     path: '/myrecord/detail',
     name: 'MyRecordDetail',
     component: MyRecordDetail,
-  }
+  },
+  {
+    path: '/users',
+    name: 'Users',
+    component: Users
+  },
+  {
+    path: '/user/detail',
+    name: 'UserDetail',
+    component: UserDetail,
+  },
 ]
 
 const router = new VueRouter({

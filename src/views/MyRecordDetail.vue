@@ -179,6 +179,7 @@ export default {
     },
     onNoteNew() {
       this.noteIndex = -1
+      this.noteText = ''
       this.showNoteDialog = true
     },
     onNoteEdit(index) {
@@ -235,7 +236,7 @@ export default {
         })
         if (res.succeed) {
           this.snackBarColor = 'success'
-          this.snackBarText = 'Record updated successfully.'
+          this.snackBarText = 'Record created successfully.'
           this.showSnackBar = true
           setTimeout(() => {
             this.processing = false
@@ -249,7 +250,7 @@ export default {
         }
       } catch (e) {
         this.snackBarColor = 'error'
-        this.snackBarText = 'Record update failed. Try again.'
+        this.snackBarText = 'Record create failed. Try again.'
         this.showSnackBar = true
         this.processing = false
       }
