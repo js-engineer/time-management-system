@@ -9,6 +9,8 @@ import Users from '../views/Users.vue'
 import UserDetail from '../views/UserDetail.vue'
 import GlobeRecords from '../views/GlobeRecords.vue'
 import GlobeRecordDetail from '../views/GlobeRecordDetail.vue'
+import Settings from '../views/Settings.vue'
+import ChangePassword from '../views/ChangePassword.vue'
 import store from '../store'
 
 Vue.use(VueRouter)
@@ -35,7 +37,7 @@ const routes = [
     component: MyRecords
   },
   {
-    path: '/myrecord/detail',
+    path: '/own-record/detail',
     name: 'MyRecordDetail',
     component: MyRecordDetail,
   },
@@ -50,14 +52,24 @@ const routes = [
     component: UserDetail,
   },
   {
-    path: '/globerecords',
+    path: '/globe-records',
     name: 'GlobeRecords',
     component: GlobeRecords
   },
   {
-    path: '/globerecord/detail',
+    path: '/globe-record/detail',
     name: 'GlobeRecordDetail',
     component: GlobeRecordDetail,
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: Settings,
+  },
+  {
+    path: '/change-password',
+    name: 'ChangePassword',
+    component: ChangePassword,
   },
 ]
 

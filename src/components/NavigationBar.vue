@@ -34,7 +34,23 @@
         </v-list-item>
         <v-list-item v-if="role === 'admin'" link @click="onNavigate('GlobeRecords')">
           <v-list-item-content>
-            <v-list-item-title :class="{ 'blue--text': activeItem === 'GlobeRecords' }">Records</v-list-item-title>
+            <v-list-item-title :class="{ 'blue--text': activeItem === 'GlobeRecords' }">All Records</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+      <v-divider></v-divider>
+      <v-list
+        dense
+        nav
+      >
+        <v-list-item link @click="onNavigate('Settings')">
+          <v-list-item-content>
+            <v-list-item-title :class="{ 'blue--text': activeItem === 'Settings' }">Settings</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item link @click="onNavigate('ChangePassword')">
+          <v-list-item-content>
+            <v-list-item-title :class="{ 'blue--text': activeItem === 'ChangePassword' }">Change Password</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
