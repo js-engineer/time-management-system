@@ -192,6 +192,7 @@ controller.deleteRecord = async (req, res) => {
 
 controller.updateRecord = async (req, res) => {
   const schema = Joi.object({
+    user: Joi.string().required(),
     notes: Joi.array().items(Joi.string()).required(),
     hours: Joi.number().required(),
   });
