@@ -144,7 +144,15 @@ controller.updateUser = async (req, res) => {
 
     const keys = Object.keys(value);
     keys.forEach((key) => {
-      user[key] = value[key];
+      if (key === 'password') {
+        user[key] = bcrypt.hashSync(
+          value.password,
+          bcrypt.genSaltSync(10),
+          null
+        );
+      } else {
+        user[key] = value[key];
+      }
     });
 
     await user.save();
