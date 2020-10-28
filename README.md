@@ -34,3 +34,7 @@ npm run serve
 ```
 npm run build
 ```
+#### E2E test using TestCafe. Tests are available for all web browsers.
+```
+npm run test
+```
