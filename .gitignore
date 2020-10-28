@@ -2,6 +2,8 @@
 node_modules
 /dist
 
+# screenshots while test
+screenshots 
 
 # local env files
 .env
