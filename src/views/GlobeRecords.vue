@@ -19,6 +19,12 @@
         </v-col>
         <v-col class="d-flex justify-content-end" sm="4">
           <v-spacer></v-spacer>
+          <v-btn class="mt-4 mr-5" color="success" @click="onExport()">
+            <v-icon dark left>
+              mdi-export
+            </v-icon>
+            Export
+          </v-btn>
           <v-btn class="mt-4" color="primary" @click="onNew()">
             <v-icon dark left>
               mdi-plus
@@ -104,6 +110,7 @@ export default {
       showSnackBar: false,
       snackBarColor: '',
       snackBarText: '',
+      exporting: false,
     }
   },
   watch: {
@@ -181,6 +188,32 @@ export default {
         this.snackBarText = 'Record delete failed. Try again.'
         this.showDeleteDialog = false
         this.showSnackBar = true
+      }
+    },
+    async onExport() {
+      try {
+        this.exporting = true
+        const params = {
+          userId: this.$store.state.auth.user._id,
+        };
+        if (this.from) {
+          params['from'] = this.from
+        }
+        if (this.to) {
+          params['to'] = this.to
+        }
+        const res = await this.$store.dispatch('record/downloadAllRecordSheet', params)
+        if (res.succeed) {
+          const blob = new Blob([res.data], { type: 'application/html' })
+          const link = document.createElement('a')
+          link.href = URL.createObjectURL(blob)
+          link.download = 
+            `Records (${this.from ? this.from : ''} - ${this.to ? this.to : ''}).html`
+          link.click()
+          URL.revokeObjectURL(link.href)
+        }
+      } catch (e) {
+        this.exporting = false
       }
     }
   }

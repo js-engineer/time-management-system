@@ -13,6 +13,7 @@ router.use((req, res, next) => {
 
 router.post('/', controller.createRecord);
 router.get('/list/all', controller.listAllRecords);
+router.get('/download/all', controller.downloadAllRecordSheet);
 router.get('/list/:userId', controller.listUserRecords);
 router.get('/download/:userId', controller.downloadUserRecordSheet);
 router.get('/by-date', controller.getRecordByUserAndDate);

@@ -266,7 +266,7 @@ controller.updateRecord = async (req, res) => {
   }
 };
 
-const getRecordsHtmlContent = (records) => {
+const getRecordsHtmlContent = (records, includesName) => {
   let content = `<html>
   <head>
     <title>Records</title>
@@ -283,10 +283,12 @@ const getRecordsHtmlContent = (records) => {
   <body>
     <table style="border: 1px solid #888888">
       <tr>
-        <th>No</th><th>Date</th><th>Hours</th><th>Notes</th>`;
+        <th>No</th>${includesName ? '<th>Name</th>' : ''}
+        <th>Date</th><th>Hours</th><th>Notes</th>`;
   records.forEach((record, index) => {
     content += `<tr>
       <td>${index + 1}</td>
+      ${includesName ? `<td>${record.user.name}</td>` : ''}
       <td>${record.date.toISOString().split('T')[0]}</td>
       <td>${record.totalHours}</td>
       <td>
@@ -330,7 +332,55 @@ controller.downloadUserRecordSheet = async (req, res) => {
       });
       records[i].totalHours = totalHours;
     }
-    const content = getRecordsHtmlContent(records);
+    const content = getRecordsHtmlContent(records, false);
+    const fileName = `${new Date().getTime().toString()}.html`;
+    fs.writeFile(`./sheets/${fileName}`, content, (err) => {
+      if (err) throw err;
+      res.writeHead(200, {
+        'Content-Type': 'application/octet-stream',
+        'Content-Disposition': `attachment; filename=${fileName}`,
+      });
+      fs.createReadStream(`./sheets/${fileName}`).pipe(res);
+    });
+  } catch (err) {
+    res.status(500).json({ err: 'Server error' });
+  }
+};
+
+controller.downloadAllRecordSheet = async (req, res) => {
+  if (req.user.role !== USER_ROLE.ADMIN) {
+    return res.status(403).json({ err: 'No permission' });
+  }
+
+  const schema = Joi.object({
+    from: Joi.date().optional(),
+    to: Joi.date().optional(),
+  });
+  const { error, value } = schema.validate(req.query);
+  if (error) {
+    const err =
+      error.details.length > 0 ? error.details[0].message : 'Invalid request';
+    return res.status(400).json({ err });
+  }
+
+  try {
+    const query = {};
+    if (value.from || value.to) {
+      query.date = Object.assign(
+        value.from ? { $gte: value.from } : {},
+        value.to ? { $lte: value.to } : {}
+      );
+    }
+
+    const records = await Record.listRecords(query, 0, -1);
+    for (let i = 0; i < records.length; i += 1) {
+      let totalHours = 0;
+      records[i].notes.forEach((note) => {
+        totalHours += note.hours;
+      });
+      records[i].totalHours = totalHours;
+    }
+    const content = getRecordsHtmlContent(records, true);
     const fileName = `${new Date().getTime().toString()}.html`;
     fs.writeFile(`./sheets/${fileName}`, content, (err) => {
       if (err) throw err;
