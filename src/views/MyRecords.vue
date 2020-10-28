@@ -46,13 +46,13 @@
             <tr
               v-for="(item, index) in props.items"
               :key="index"
-              :class="item.hours > preferredHours ? 'red lighten-5' : 'blue lighten-5'"
+              :class="item.totalHours > preferredHours ? 'red lighten-5' : 'blue lighten-5'"
             >
               <td>{{ index + 1 }}</td>
               <td>{{ item['user']['name'] }}</td>
               <td>{{ item['date'].split('T')[0] }}</td>
-              <td>{{ item['hours'] }}</td>
-              <td>{{ item['notes'][0] ? `${item['notes'][0]} [${item['notes'].length}]` : '[0]' }}</td>
+              <td>{{ item['totalHours'] }}</td>
+              <td>{{ item['notes'][0] ? `${item['notes'][0]['text']} [${item['notes'].length}]` : '[0]' }}</td>
               <td>
                 <v-btn text icon color="blue darken-2" @click="onEdit( item['_id'] )">
                   <v-icon>mdi-pencil</v-icon>
@@ -104,7 +104,7 @@ export default {
         { text: 'No', align: 'center', sortable: false },
         { text: 'Name', align: 'center', sortable: false },
         { text: 'Date', align: 'center', sortable: false },
-        { text: 'Hours', align: 'center', sortable: false },
+        { text: 'Total hours', align: 'center', sortable: false },
         { text: 'Note', align: 'center', sortable: false },
         { text: 'Actions', align: 'center', sortable: false },
       ],

@@ -51,7 +51,7 @@
       <v-card>
         <v-card-title class="headline blue lighten-2 white--text">Confirm delete</v-card-title>
         <v-card-text class="text-left mt-5">
-          Are you sure to delete this user?
+          Are you sure to delete this user? All records will be removed too.
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions>

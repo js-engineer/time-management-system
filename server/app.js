@@ -38,9 +38,7 @@ app.use(async (req, res, next) => {
       req.user = {
         _id: userJson._id,
         role: userJson.role,
-        name: userJson.name,
         email: userJson.email,
-        preferredHours: userJson.preferredHours,
       };
     }
   } catch (err) {}

@@ -85,9 +85,7 @@ controller.login = async (req, res) => {
       {
         _id: user._id,
         role: user.role,
-        name: user.name,
         email: user.email,
-        preferredHours: user.preferredHours,
       },
       process.env.SECRET_KEY,
       {
@@ -136,17 +134,19 @@ controller.verifyEmail = async (req, res) => {
   }
 };
 
-controller.checkToken = (req, res) => {
-  if (req.user) {
-    const token = jwt.sign(req.user, process.env.SECRET_KEY, {
-      expiresIn: '12h',
-    });
-    res.json({
-      token,
-      user: req.user,
-    });
-  } else {
-    res.status(401).json({ err: 'Invalid token' });
+controller.checkToken = async (req, res) => {
+  try {
+    if (req.user) {
+      const token = jwt.sign(req.user, process.env.SECRET_KEY, {
+        expiresIn: '12h',
+      });
+      const user = await User.findById(req.user._id);
+      res.json({ token, user });
+    } else {
+      res.status(401).json({ err: 'Invalid token' });
+    }
+  } catch (err) {
+    res.status(500).json({ err: 'Server error' });
   }
 };
 

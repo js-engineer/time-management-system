@@ -12,13 +12,6 @@
           </v-col>
         </v-row>
         <DatePicker v-model="date" label="Date" :rules="dateRules" />
-        <v-text-field
-          label="Hours"
-          v-model="hours"
-          type="number"
-          :rules="hoursRules"
-          required
-        ></v-text-field>
         <v-card
           class="mx-auto"
           subheader
@@ -35,9 +28,12 @@
             <v-list-item-content>
               <v-list-item-title class="text-left d-flex">
                 <p class="text-wrap">
-                  {{ item }}
+                  {{ item['text'] }}
                 </p>
                 <v-spacer></v-spacer>
+                <p class="mr-5">
+                  {{ item['hours']}} h
+                </p>
                 <v-btn text icon color="blue darken-2" x-small @click="onNoteEdit(index)">
                   <v-icon>mdi-pencil</v-icon>
                 </v-btn>
@@ -65,22 +61,30 @@
       </v-form>
     </div>
     <v-dialog v-model="showNoteDialog" width="500">
-      <v-card>
-        <v-card-title class="headline blue lighten-2 white--text">{{ noteIndex === -1 ? 'Add note' : 'Edit note' }}</v-card-title>
-        <v-card-text>
-          <v-textarea
-            name="input-7-1"
-            label="Enter your note"
-            v-model="noteText"
-          ></v-textarea>
-        </v-card-text>
-        <v-divider></v-divider>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" text @click="onNoteComplete()">Save</v-btn>
-          <v-btn color="primary" text @click="showNoteDialog = false">Cancel</v-btn>
-        </v-card-actions>
-      </v-card>
+      <v-form v-model="isNoteValid">
+        <v-card>
+          <v-card-title class="headline blue lighten-2 white--text">{{ noteIndex === -1 ? 'Add note' : 'Edit note' }}</v-card-title>
+          <v-card-text>
+            <v-textarea
+              label="Enter your note"
+              v-model="noteText"
+              :rules="noteTextRules"
+            ></v-textarea>
+            <v-text-field
+              label="Enter your hours"
+              number
+              v-model="noteHours"
+              :rules="noteHoursRules"
+            ></v-text-field>
+          </v-card-text>
+          <v-divider></v-divider>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" text @click="onNoteComplete()" :disabled="!isNoteValid">Save</v-btn>
+            <v-btn color="primary" text @click="showNoteDialog = false">Cancel</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-form>
     </v-dialog>
   </v-container>
 </template>
@@ -103,13 +107,17 @@ export default {
       dateRules: [
         (v) => !!v || 'Date is required',
       ],
-      hours: 0,
-      hoursRules: [
-        (v) => !!v || 'Hours is required',
-      ],
       notes: [],
       noteIndex: -1,
+      isNoteValid: false,
       noteText: '',
+      noteTextRules: [
+        (v) => !!v || 'Note Text is required',
+      ],
+      noteHours: 0,
+      noteHoursRules: [
+        (v) => !!v || 'Note Hours is required',
+      ],
       showNoteDialog: false,
       showSnackBar: false,
       snackBarColor: '',
@@ -136,11 +144,9 @@ export default {
             this.showSnackBar = true
             this.recordId = res.record._id
             this.notes = res.record.notes
-            this.hours = res.record.hours
           } else {
             this.recordId = null
             this.notes = []
-            this.hours = 0
           }
         } catch (e) {
           console.log(e)
@@ -156,7 +162,6 @@ export default {
         if (res.succeed) {
           this.notes = res.record.notes
           this.date = res.record.date.split('T')[0]
-          this.hours = res.record.hours
         }
       } catch (e) {
         console.log(e)
@@ -175,11 +180,13 @@ export default {
     onNoteNew() {
       this.noteIndex = -1
       this.noteText = ''
+      this.noteHours = 0
       this.showNoteDialog = true
     },
     onNoteEdit(index) {
       this.noteIndex = index
-      this.noteText = this.notes[index]
+      this.noteText = this.notes[index]['text']
+      this.noteHours = this.notes[index]['hours']
       this.showNoteDialog = true
     },
     onNoteDelete(index) {
@@ -187,9 +194,10 @@ export default {
     },
     onNoteComplete() {
       if (this.noteIndex === -1) {
-        this.notes.push(this.noteText)
+        this.notes.push({ text: this.noteText, hours: this.noteHours })
       } else {
-        this.notes[this.noteIndex] = this.noteText
+        this.notes[this.noteIndex]['text'] = this.noteText
+        this.notes[this.noteIndex]['hours'] = this.noteHours
       }
       this.showNoteDialog = false
     },
@@ -199,7 +207,6 @@ export default {
           id: this.recordId,
           user: this.userId,
           date: this.date,
-          hours: this.hours,
           notes: this.notes
         })
         if (res.succeed) {
@@ -228,7 +235,6 @@ export default {
         const res = await this.$store.dispatch('record/createRecord', {
           user: this.userId,
           date: this.date,
-          hours: this.hours,
           notes: this.notes
         })
         if (res.succeed) {

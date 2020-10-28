@@ -10,8 +10,14 @@ controller.createRecord = async (req, res) => {
   const schema = Joi.object({
     user: Joi.string().required(),
     date: Joi.date().required(),
-    notes: Joi.array().items(Joi.string()).required(),
-    hours: Joi.number().required(),
+    notes: Joi.array()
+      .items(
+        Joi.object({
+          text: Joi.string().required(),
+          hours: Joi.number().required(),
+        })
+      )
+      .required(),
   });
   const { error, value } = schema.validate(req.body);
   if (error) {
@@ -74,6 +80,13 @@ controller.listUserRecords = async (req, res) => {
       value.pageNum,
       value.pageSize
     );
+    for (let i = 0; i < records.length; i += 1) {
+      let totalHours = 0;
+      records[i].notes.forEach((note) => {
+        totalHours += note.hours;
+      });
+      records[i].totalHours = totalHours;
+    }
     res.json({
       totalCounts,
       records,
@@ -115,6 +128,13 @@ controller.listAllRecords = async (req, res) => {
       value.pageNum,
       value.pageSize
     );
+    for (let i = 0; i < records.length; i += 1) {
+      let totalHours = 0;
+      records[i].notes.forEach((note) => {
+        totalHours += note.hours;
+      });
+      records[i].totalHours = totalHours;
+    }
     res.json({
       totalCounts,
       records,
@@ -138,6 +158,11 @@ controller.getRecordById = async (req, res) => {
     ) {
       return res.status(403).json({ err: 'No permission' });
     }
+    let totalHours = 0;
+    record.notes.forEach((note) => {
+      totalHours += note.hours;
+    });
+    record.totalHours = totalHours;
     res.json({ record });
   } catch (err) {
     res.status(500).json({ err: 'Server error' });
@@ -164,6 +189,11 @@ controller.getRecordByUserAndDate = async (req, res) => {
     if (!record) {
       return res.status(404).json({ err: 'Cannot find record' });
     }
+    let totalHours = 0;
+    record.notes.forEach((note) => {
+      totalHours += note.hours;
+    });
+    record.totalHours = totalHours;
     res.json({ record });
   } catch (err) {
     res.status(500).json({ err: 'Server error' });
@@ -194,9 +224,15 @@ controller.deleteRecord = async (req, res) => {
 controller.updateRecord = async (req, res) => {
   const schema = Joi.object({
     user: Joi.string().required(),
-    notes: Joi.array().items(Joi.string()).required(),
+    notes: Joi.array()
+      .items(
+        Joi.object({
+          text: Joi.string().required(),
+          hours: Joi.number().required(),
+        })
+      )
+      .required(),
     date: Joi.date().required(),
-    hours: Joi.number().required(),
   });
   const { error, value } = schema.validate(req.body);
   if (error) {
@@ -252,8 +288,9 @@ const getRecordsHtmlContent = (records) => {
     content += `<tr>
       <td>${index + 1}</td>
       <td>${record.date.toISOString().split('T')[0]}</td>
-      <td>${record.hours}</td>
-      <td><ul>${record.notes.map((note) => `<li>${note}</li>`).join(' ')}</ul>
+      <td>${record.totalHours}</td>
+      <td>
+      <ul>${record.notes.map((note) => `<li>${note.text}</li>`).join(' ')}</ul>
       </td>
     </tr>`;
   });
@@ -286,6 +323,13 @@ controller.downloadUserRecordSheet = async (req, res) => {
       );
     }
     const records = await Record.listRecords(query, 0, -1);
+    for (let i = 0; i < records.length; i += 1) {
+      let totalHours = 0;
+      records[i].notes.forEach((note) => {
+        totalHours += note.hours;
+      });
+      records[i].totalHours = totalHours;
+    }
     const content = getRecordsHtmlContent(records);
     const fileName = `${new Date().getTime().toString()}.html`;
     fs.writeFile(`./sheets/${fileName}`, content, (err) => {

@@ -159,6 +159,7 @@ export default {
     async updateUser() {
       const data = {
         id: this.userId,
+        name: this.name,
         email: this.email,
         password: this.enablePasswordChange ? this.password : null,
         preferredHours: this.preferredHours,
