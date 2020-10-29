@@ -93,7 +93,9 @@ controller.login = async (req, res) => {
       }
     );
 
-    return res.status(200).json({ token, user });
+    return res
+      .status(200)
+      .json({ token, user: await User.getUserById(user._id) });
   } catch (err) {
     res.status(500).json({ err: 'Server error' });
   }
@@ -140,7 +142,7 @@ controller.checkToken = async (req, res) => {
       const token = jwt.sign(req.user, process.env.SECRET_KEY, {
         expiresIn: '12h',
       });
-      const user = await User.findById(req.user._id);
+      const user = await User.getUserById(req.user._id);
       res.json({ token, user });
     } else {
       res.status(401).json({ err: 'Invalid token' });

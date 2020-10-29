@@ -21,6 +21,7 @@
           label="E-mail"
           v-model="email"
           :rules="emailRules"
+          :disabled="userId"
           required
         ></v-text-field>
         <v-checkbox

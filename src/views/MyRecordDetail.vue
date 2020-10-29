@@ -140,7 +140,7 @@ export default {
           })
           if (res.succeed) {
             this.snackBarColor = 'orange darken-2'
-            this.snackBarText = 'Record already exists. You are gonna edit the record.'
+            this.snackBarText = 'You are gonna edit an existing record.'
             this.showSnackBar = true
             this.recordId = res.record._id
             this.notes = res.record.notes
