@@ -46,7 +46,7 @@
             <tr
               v-for="(item, index) in props.items"
               :key="index"
-              :class="item.totalHours > preferredHours ? 'red lighten-5' : 'blue lighten-5'"
+              :class="item.totalHours >= preferredHours ? 'red lighten-5' : 'green lighten-5'"
             >
               <td>{{ index + 1 }}</td>
               <td>{{ item['user']['name'] }}</td>
